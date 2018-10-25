@@ -1,0 +1,45 @@
+- name: Include Vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "variables.yml"
+
+- name: Check if android studio is installed
+  command: grep {{android_studio_build_text}} {{install_dir}}/build.txt
+  register: install
+  failed_when: false
+  changed_when: false
+
+- name: Get sha256 zip
+  stat:
+    path: "{{local_package_location}}"
+    checksum_algorithm: sha256
+    get_checksum: yes
+  register: zip_stat
+
+- name: Download Android Studio .zip
+  when: zip_stat.stat.checksum != "{{studio_checksum}}"
+  get_url:
+    url: "{{linux_url}}"
+    dest: "{{local_package_location}}"
+    validate_certs: no
+    checksum: sha256:{{studio_checksum}}
+  register: download
+
+- name: unlink install dir
+  file:
+    path: "{{install_dir}}"
+    state: absent
+  when: install.stdout.find(android_studio_build_text) == -1
+  become: true
+
+- name: for debug
+  debug:
+    msg: "unlink install dir"
+  when: install.stdout.find(android_studio_build_text) == -1
+
+- name: Uncompress Android Studio
+  unarchive:
+    src: "{{local_package_location}}"
+    dest: /opt
+  become: true
+  when: install.stdout.find(android_studio_build_text) == -1

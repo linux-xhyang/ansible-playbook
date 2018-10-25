@@ -1,0 +1,13 @@
+
+- name: Install Android Tool
+  hosts: localhost
+  become: true
+
+  vars_files:
+    - vars/variables.yml
+
+  roles:
+    - role: android_studio
+
+  tags:
+    - toolkit-install

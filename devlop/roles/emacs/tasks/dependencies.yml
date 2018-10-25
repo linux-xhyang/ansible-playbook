@@ -1,0 +1,61 @@
+- name: Install requied packages for which order does not matter
+  apt: pkg={{ item }} state=present update_cache=yes install_recommends=no cache_valid_time=604800
+  become: yes
+  with_items:
+    - autoconf
+    - automake
+    - imagemagick
+    - libasound2-dev
+    - libdbus-1-dev
+    - libgconf2-dev
+    - libgif-dev
+    - libgpm-dev
+    - libjpeg-dev
+    - libxpm-dev
+    - liblockfile-dev
+    - libm17n-dev
+    - libmagick++-dev
+    - libncurses5-dev
+    - libotf-dev
+    - libpng-dev
+    - librsvg2-dev
+    - libselinux1-dev
+    - libtiff5-dev
+    - libxaw7-dev
+    - libxml2-dev
+    - libxaw7-dev
+    - sharutils
+    - texinfo
+    - xaw3dg-dev
+    - libgnutls-dev
+    # For xwidgets
+    - libgtk-3-dev
+    - libwebkitgtk-3.0-dev
+    # To integrate terminal emacs with system clipboard
+    - xsel
+    - git
+  tags:
+      - setup
+
+- name: Setup | set postfix selections wtihout prompting
+  shell: echo postfix postfix/mailname string `hostname` | debconf-set-selections
+  register: firstSelection
+  tags:
+    - setup
+
+- name: Setup | second selection
+  when: firstSelection is success
+  shell: echo postfix postfix/main_mailer_type string 'No configuration' | debconf-set-selections
+  register: secondSelection
+  tags:
+    - setup
+
+- name: Setup | install postfix
+  when: secondSelection is success
+  apt: pkg={{ item }} state=present update_cache=yes install_recommends=no cache_valid_time=604800
+  with_items:
+    - postfix
+  become: yes
+  register: postfixInstalled
+  tags:
+    - setup

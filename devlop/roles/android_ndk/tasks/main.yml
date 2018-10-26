@@ -1,0 +1,48 @@
+- name: Include Vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "variables.yml"
+
+- name: get the username running the deploy
+  command: whoami
+  become: no
+  register: username_on_the_host
+
+- name: Check if android ndk is installed
+  command: grep {{android_ndk_version_text}} {{install_dir}}/source.properties
+  register: install
+  failed_when: false
+  changed_when: false
+  become: no
+
+- name: Get sha1 zip
+  stat:
+    path: "/home/{{username_on_the_host.stdout}}/{{android_ndk_cache_dir}}/{{android_ndk_zipfile}}"
+    checksum_algorithm: sha1
+    get_checksum: yes
+  register: zip_stat
+  become: no
+
+- debug:
+    msg: "{{zip_stat}}"
+
+- name: Download Android NDK {{android_ndk_version}}
+  when: (not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{android_ndk_checksum}}")
+  get_url:
+    dest: "/home/{{username_on_the_host.stdout}}/{{android_ndk_cache_dir}}"
+    url: "https://dl.google.com/android/repository/{{android_ndk_zipfile}}"
+    validate_certs: no
+    checksum: sha256:{{android_ndk_checksum}}
+  become: no
+  tags: [android]
+
+- name: Extract Android NDK
+  unarchive: copy=no src=/home/{{username_on_the_host.stdout}}/{{android_ndk_cache_dir}}/{{android_ndk_zipfile}} dest=/opt/
+  become: yes
+  when: install.stdout.find(android_ndk_version_text) == -1
+  tags: [android]
+
+- name: Add Android environment variables to profile
+  template: src=android-ndk.j2 dest=/etc/profile.d/android-ndk.sh
+  become: yes
+  tags: [android]

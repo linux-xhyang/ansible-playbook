@@ -3,6 +3,11 @@
   with_first_found:
     - "variables.yml"
 
+- name: get the username running the deploy
+  command: whoami
+  become: no
+  register: username_on_the_host
+
 - name: Check if android studio is installed
   command: grep {{android_studio_build_text}} {{install_dir}}/build.txt
   register: install
@@ -11,26 +16,31 @@
 
 - name: Get sha256 zip
   stat:
-    path: "{{local_package_location}}"
+    path: "/home/{{username_on_the_host.stdout}}/{{local_package_location}}"
     checksum_algorithm: sha256
     get_checksum: yes
   register: zip_stat
+  become: no
+
+- debug:
+    msg: "{{zip_stat}}"
 
 - name: Download Android Studio .zip
-  when: zip_stat.stat.checksum != "{{studio_checksum}}"
+  when: (not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{studio_checksum}}")
   get_url:
     url: "{{linux_url}}"
-    dest: "{{local_package_location}}"
+    dest: "/home/{{username_on_the_host.stdout}}/{{local_package_location}}"
     validate_certs: no
     checksum: sha256:{{studio_checksum}}
   register: download
+  become: no
 
 - name: unlink install dir
   file:
     path: "{{install_dir}}"
     state: absent
   when: install.stdout.find(android_studio_build_text) == -1
-  become: true
+  become: yes
 
 - name: for debug
   debug:
@@ -39,7 +49,7 @@
 
 - name: Uncompress Android Studio
   unarchive:
-    src: "{{local_package_location}}"
+    src: "/home/{{username_on_the_host.stdout}}/{{local_package_location}}"
     dest: /opt
-  become: true
+  become: yes
   when: install.stdout.find(android_studio_build_text) == -1

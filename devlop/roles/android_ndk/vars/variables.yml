@@ -1,0 +1,7 @@
+android_ndk_cache_dir: "Downloads/ansible-cache"
+android_ndk_version: "16b"
+android_ndk_zipfile: "android-ndk-r{{android_ndk_version}}-linux-x86_64.zip"
+android_ndk_folder: "android-ndk-r{{android_ndk_version}}"
+android_ndk_checksum: "42aa43aae89a50d1c66c3f9fdecd676936da6128"
+android_ndk_version_text: "16.1.4479499"
+install_dir: "/opt/android-ndk-r16b"

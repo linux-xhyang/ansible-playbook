@@ -8,6 +8,7 @@
 
   roles:
     - role: android_studio
+    - role: android_ndk
 
   tags:
     - toolkit-install

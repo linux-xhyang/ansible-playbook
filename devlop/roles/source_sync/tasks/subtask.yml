@@ -1,0 +1,58 @@
+- debug:
+    msg: "{{sync_work.repo_url}}"
+
+- name: get the username running the deploy
+  command: whoami
+  become: no
+  register: username_on_the_host
+
+- stat: path="{{sync_work.dest_dir}}"
+  register: pulled
+  become: no
+  tags:
+    - pull
+
+- name: use file module to create a timestamp file for "now"
+  file: path="~/ansible.now" state=touch
+  tags:
+    - pull
+
+- stat: path=~/ansible.now
+  register: now
+  tags:
+    - pull
+
+
+- name: Setup | pull latest {{sync_work.repo_url}} sources
+  when: ((not pulled.stat.exists) or
+         (pulled.stat.exists and pulled.stat.mtime  + secondsPerWeek < now.stat.mtime))
+  git: repo={{sync_work.repo_url}} accept_hostkey=true dest={{sync_work.dest_dir}}
+  register: src
+  become: no
+  tags:
+    - pull
+
+- name: Build {{sync_work.dest_dir}} sources
+  when: src is success and (not src is skipped) and "'build_cmd' in sync_work.key"
+  loop_control:
+    loop_var: cmd
+  command: "{{cmd}} chdir={{sync_work.dest_dir}}"
+  with_items: "{{sync_work.build_cmd}}"
+  register: configure
+  become: no
+  tags:
+    - build
+
+- name: Setup | install
+  when: configure is success and (not configure is skipped)
+  command: make install chdir={{pulled.stat.path}}
+  become: yes
+  tags:
+    - install
+
+- name: Setup | remember when we last pulled {{sync_work.dest_dir}} sources
+  file: path={{sync_work.dest_dir}}  state=touch
+  when: src is success and (not src is skipped)
+  become: no
+  tags:
+      - pull

@@ -1,0 +1,7 @@
+- name: Include Vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "variables.yml"
+
+- include: subtask.yml sync_work={{item}} #repo_url={{item.repo_url}} dest_dir={{item.dest_dir}}
+  with_items: "{{sources}}"

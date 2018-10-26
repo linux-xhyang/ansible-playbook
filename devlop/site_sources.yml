@@ -1,12 +1,12 @@
 
-- name: Install Emacs
+- name: Install Sources
   hosts: localhost
   become: true
   vars_files:
     - vars/variables.yml
 
   roles:
-    - role: emacs
+    - role: source_sync
 
   tags:
     - toolkit-install

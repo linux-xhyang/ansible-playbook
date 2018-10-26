@@ -1,0 +1,30 @@
+sources:
+  - name: catapult
+    repo_url: "https://github.com/catapult-project/catapult.git"
+    dest_dir: "~/src/catapult/"
+    use_command: "git"
+
+  - name: pydata
+    repo_url: "https://github.com/linux-xhyang/pydata.git"
+    dest_dir: "~/src/pydata/"
+    use_command: "git"
+
+  - name: opencv
+    repo_url: "https://github.com/opencv/opencv.git"
+    dest_dir: "~/src/opencv/"
+    use_command: "git"
+
+  - name: ndk-project
+    repo_url: "https://github.com/linux-xhyang/ndk-project.git"
+    dest_dir: "~/src/ndk-project/"
+    use_command: "git"
+
+  - name: ctags
+    repo_url: "https://github.com/universal-ctags/ctags.git"
+    dest_dir: "~/src/ctags/"
+    use_command: "git"
+    build_cmd:
+      - "./autogen.sh"
+      - "./configure --exec-prefix=/usr/"
+      - "make"
+    install_cmd: "make install"

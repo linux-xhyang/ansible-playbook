@@ -3,5 +3,12 @@
   with_first_found:
     - "variables.yml"
 
+- name: Install requied packages for which order does not matter
+  apt: pkg={{ item }} state=present update_cache=yes install_recommends=no cache_valid_time=604800
+  become: yes
+  with_items:
+    - subversion
+    - cvs
+
 - include: subtask.yml sync_work={{item}} #repo_url={{item.repo_url}} dest_dir={{item.dest_dir}}
   with_items: "{{sources}}"

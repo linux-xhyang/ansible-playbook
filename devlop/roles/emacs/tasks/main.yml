@@ -67,15 +67,18 @@
 
 # build from source just pulled.  These take a while
 - name: Setup | autogen
-  when: src is success and (not src is skipped)
+  when: src.changed
   command: ./autogen.sh chdir=~/src/emacs
   register: autogen
   become: no
   tags:
     - build
 
+- debug:
+    msg: "{{autogen}}"
+#
 - name: Setup | configure
-  when: autogen is success and (not autogen is skipped)
+  when: autogen.changed
   command: ./configure --enable-link-time-optimization --without-pop --without-kerberos --without-kerberos5 --without-hesiod --with-sound=alsa --with-x-toolkit=gtk3 --with-xpm --with-jpeg --with-tiff --with-gif --with-png --with-rsvg  --with-xml2 --with-imagemagick --with-xft --without-libotf --with-xim --with-xaw3d --with-dbus --without-gconf --without-gsettings --without-selinux --with-gnutls --with-zlib --with-modules --with-file-notification=inotify --without-makeinfo --with-x --exec-prefix=/usr/ chdir=~/src/emacs
   register: configure
   become: no
@@ -83,16 +86,18 @@
     - build
 
 - name: Setup | bootstrap
-  when: configure is success and (not configure is skipped)
+  when: configure.changed
   command: make bootstrap -j8 chdir=~/src/emacs
   register: bootstrap
   become: no
   tags:
     - build
 
+- debug:
+    msg: "{{bootstrap}}"
 # install
 - name: Setup | install
-  when: bootstrap is success and (not bootstrap is skipped)
+  when: bootstrap.changed
   command: make install chdir=/home/{{username_on_the_host.stdout}}/src/emacs
   become: yes
   tags:
@@ -100,7 +105,6 @@
 
 - name: Setup | remember when we last pulled emacs sources
   file: path=~/src/emacs/  state=touch
-  when: src is success and (not src is skipped)
   become: no
   tags:
       - pull

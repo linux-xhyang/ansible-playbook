@@ -1,6 +1,3 @@
-- debug:
-    msg: "{{sync_work.repo_url}}"
-
 - name: get the username running the deploy
   command: whoami
   become: no
@@ -23,36 +20,41 @@
     - pull
 
 
-- name: Setup | pull latest {{sync_work.repo_url}} sources
+- name: Pull latest {{sync_work.repo_url}} sources
   when: ((not pulled.stat.exists) or
          (pulled.stat.exists and pulled.stat.mtime  + secondsPerWeek < now.stat.mtime))
-  git: repo={{sync_work.repo_url}} accept_hostkey=true dest={{sync_work.dest_dir}}
+  git: repo={{sync_work.repo_url}} accept_hostkey=true dest={{sync_work.dest_dir}} track_submodules=yes force=yes
   register: src
   become: no
   tags:
     - pull
 
+- debug:
+    msg: "{{sync_work}} and {{src}}"
+
 - name: Build {{sync_work.dest_dir}} sources
-  when: src is success and (not src is skipped) and "'build_cmd' in sync_work.key"
   loop_control:
     loop_var: cmd
   command: "{{cmd}} chdir={{sync_work.dest_dir}}"
+  when: src.changed and {{'build_cmd' in sync_work.keys()}}
   with_items: "{{sync_work.build_cmd}}"
-  register: configure
+  register: configure_make
   become: no
   tags:
     - build
 
-- name: Setup | install
-  when: configure is success and (not configure is skipped)
+- debug:
+    msg: "{{configure_make.changed}}"
+
+- name: Install {{sync_work}} sources
   command: make install chdir={{pulled.stat.path}}
+  when: configure_make.changed and {{'install_cmd' in sync_work.keys()}}
   become: yes
   tags:
     - install
 
-- name: Setup | remember when we last pulled {{sync_work.dest_dir}} sources
+- name: Remember when we last pulled {{sync_work.dest_dir}} sources
   file: path={{sync_work.dest_dir}}  state=touch
-  when: src is success and (not src is skipped)
   become: no
   tags:
       - pull

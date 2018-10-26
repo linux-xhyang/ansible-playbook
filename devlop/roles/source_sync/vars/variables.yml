@@ -28,3 +28,21 @@ sources:
       - "./configure --exec-prefix=/usr/"
       - "make"
     install_cmd: "make install"
+
+  - name: global
+    repo_url: "https://github.com/punitagrawal/global.git"
+    dest_dir: "~/src/global/"
+    use_command: "git"
+    build_cmd:
+      - "sh reconf.sh"
+      - "./configure"
+      - "make -j8"
+    install_cmd: "make install"
+
+  - name: cquery
+    repo_url: "https://github.com/cquery-project/cquery.git"
+    dest_dir: "~/src/cquery/"
+    use_command: "git"
+    build_cmd:
+      - "mkdir -p build"
+      - "cmake -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES --build build"

@@ -71,3 +71,5 @@
   template: src=texlive.j2 dest=/etc/profile.d/texlive.sh
   become: yes
   tags: [texlive]
+
+- include: dependencies.yml

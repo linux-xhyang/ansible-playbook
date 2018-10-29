@@ -1,0 +1,5 @@
+texlive_cache_dir: "Downloads/ansible-cache"
+texlive_version: "texlive2018-20180414.iso"
+texlive_url: "https://mirrors.tuna.tsinghua.edu.cn/CTAN/systems/texlive/Images/{{texlive_version}}"
+texlive_checksum: "5b547f6949d9688e56b11633f55806cf"
+texlive_version_text: "TeX 3.14159265 (TeX Live 2018)"

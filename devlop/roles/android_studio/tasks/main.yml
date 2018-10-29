@@ -20,13 +20,15 @@
     checksum_algorithm: sha256
     get_checksum: yes
   register: zip_stat
+  when: install.stdout.find(android_studio_build_text) == -1
   become: no
 
 - debug:
     msg: "{{zip_stat}}"
 
-- name: Download Android Studio .zip
-  when: (not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{studio_checksum}}")
+- name: Download Android Studio zip
+  when: install.stdout.find(android_studio_build_text) == -1 and
+        (not zip_stat.stat.exists or (zip_stat.stat.checksum != "{{studio_checksum}}"))
   get_url:
     url: "{{linux_url}}"
     dest: "/home/{{username_on_the_host.stdout}}/{{local_package_location}}"

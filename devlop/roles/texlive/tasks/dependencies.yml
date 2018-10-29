@@ -1,0 +1,10 @@
+- name: Install requied packages for which order does not matter
+  apt: pkg={{ item }} state=present update_cache=yes install_recommends=no cache_valid_time=604800
+  become: yes
+  with_items:
+    - xfonts-wqy
+    - ttf-wqy-microhei
+    - ttf-wqy-zenhei
+    - fonts-font-awesome
+  tags:
+      - setup

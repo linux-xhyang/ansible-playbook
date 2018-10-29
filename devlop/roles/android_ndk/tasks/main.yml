@@ -21,13 +21,15 @@
     checksum_algorithm: sha1
     get_checksum: yes
   register: zip_stat
+  when: install.stdout.find(android_ndk_version_text) == -1
   become: no
 
 - debug:
     msg: "{{zip_stat}}"
 
 - name: Download Android NDK {{android_ndk_version}}
-  when: (not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{android_ndk_checksum}}")
+  when: install.stdout.find(android_ndk_version_text) == -1 and
+        ((not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{android_ndk_checksum}}"))
   get_url:
     dest: "/home/{{username_on_the_host.stdout}}/{{android_ndk_cache_dir}}"
     url: "https://dl.google.com/android/repository/{{android_ndk_zipfile}}"

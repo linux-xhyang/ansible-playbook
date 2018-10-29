@@ -1,0 +1,73 @@
+- name: Include Vars
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "variables.yml"
+
+- name: get the username running the deploy
+  command: whoami
+  become: no
+  register: username_on_the_host
+
+- name: Check if texlive is installed
+  command: tex -v |grep "{{texlive_version_text}}"
+  register: install
+  failed_when: false
+  changed_when: false
+  become: no
+
+- name: Get md5 zip
+  stat:
+    path: "/home/{{username_on_the_host.stdout}}/{{texlive_cache_dir}}/{{texlive_version}}"
+    checksum_algorithm: md5
+    get_checksum: yes
+  register: zip_stat
+  when: install.stdout.find(texlive_version_text) == -1
+  become: no
+
+- debug:
+    msg: "{{zip_stat}}"
+
+- name: Download Texlive {{texlive_version}}
+  when: install.stdout.find(texlive_version_text) == -1 and
+        ((not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{texlive_checksum}}"))
+  get_url:
+    dest: "/home/{{username_on_the_host.stdout}}/{{texlive_cache_dir}}"
+    url: "{{texlive_url}}"
+    validate_certs: no
+    checksum: md5:{{texlive_checksum}}
+  become: no
+  tags: [texlive]
+
+- name: Mount Texlive ISO
+  mount:
+    src: /home/{{username_on_the_host.stdout}}/{{texlive_cache_dir}}/{{texlive_version}}
+    path: "/media/texlive"
+    fstype: iso9660
+    opts: ro,loop,noauto
+    state: mounted
+  become: yes
+  when: install.stdout.find(texlive_version_text) == -1
+  tags: [texlive]
+
+- name: Create TexLive profile
+  template: src=texlive.profile dest=/tmp/texlive.profile
+  become: yes
+  when: install.stdout.find(texlive_version_text) == -1
+  tags: [texlive]
+
+- name: Install Texlive
+  command: ./install-tl --profile=/tmp/texlive.profile chdir=/media/texlive
+  when: install.stdout.find(texlive_version_text) == -1
+  become: yes
+
+- name: Add Font to system
+  copy: src={{item}} dest=/usr/share/fonts/win/
+  with_fileglob:
+    - ../templates/win/*
+  become: yes
+  tags: [texlive]
+
+- name: Add TexLive environment variables to profile
+  template: src=texlive.j2 dest=/etc/profile.d/texlive.sh
+  become: yes
+  tags: [texlive]

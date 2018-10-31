@@ -1,0 +1,106 @@
+---
+- name: "Go-Lang | Get $HOME"
+  shell: "echo $HOME"
+  register: shell_home_dir
+  changed_when: false
+  when: fubarhouse_user_dir is not defined
+
+- name: "Go-Lang | Set $HOME"
+  set_fact:
+    fubarhouse_user_dir: "{{ shell_home_dir.stdout }}"
+  when: fubarhouse_user_dir is not defined
+
+- name: "Go-Lang | Define GOROOT"
+  set_fact:
+    GOROOT: /usr/local/go
+  when: GOROOT is not defined
+
+- name: "Go-Lang | Define GOPATH"
+  set_fact:
+    GOPATH: "{{ fubarhouse_user_dir }}/go"
+  when:
+    - GOROOT is defined
+    - GOPATH is not defined
+
+- name: "Go-Lang | Define shell exports"
+  set_fact:
+    shell_exports:
+      - regex: "export GOROOT"
+        lineinfile: "export GOROOT={{ GOROOT }}"
+      - regex: "export GOPATH"
+        lineinfile: "export GOPATH={{ GOPATH }}"
+      - regex: "PATH:{{ GOROOT }}/bin"
+        lineinfile: "export PATH=$PATH:{{ GOROOT }}/bin"
+      - regex: "PATH:{{ GOPATH }}/bin"
+        lineinfile: "export PATH=$PATH:{{ GOPATH }}/bin"
+  when:
+    - golang_shell_profile is defined
+    - shell_exports is not defined
+
+- name: Download the Go tarball
+  get_url:
+    url: "{{ go_download_location }}"
+    dest: /usr/local/src/{{ go_tarball }}
+    checksum: "{{ go_tarball_checksum }}"
+  become: yes
+
+- name: Register the current Go version (if any)
+  command: /usr/local/go/bin/go version
+  ignore_errors: yes
+  register: go_version
+  changed_when: false
+
+- name: Remove old installation of Go
+  file:
+    path: /usr/local/go
+    state: absent
+  when: go_version|failed or go_version.stdout != go_version_target
+
+- name: Extract the Go tarball if Go is not yet installed or not the desired version
+  unarchive:
+    src: /usr/local/src/{{ go_tarball }}
+    dest: /usr/local
+    copy: no
+  when: go_version|failed or go_version.stdout != go_version_target
+  become: yes
+  register: install
+
+- name: Add the Go bin directory to the PATH environment variable for all users
+  copy:
+    src: go-bin.sh
+    dest: /etc/profile.d
+  become: yes
+
+- name: Set GOPATH for all users
+  copy:
+    src: go-path.sh
+    dest: /etc/profile.d
+  when: set_go_path
+  become: yes
+
+- name: "Go-Lang | Define list of package directories"
+  set_fact:
+    go_package_locations:
+    - "{{ GOPATH }}/bin"
+    - "{{ GOPATH }}/pkg"
+    - "{{ GOPATH }}/src"
+  when: go_reget|bool == true
+
+- name: "Go-Lang | Remove installed workspace packages"
+  file:
+    path: "{{ item }}"
+    state: absent
+  with_items: "{{ go_package_locations }}"
+  ignore_errors: yes
+  when:
+    - go_reget|bool == true
+    - go_package_locations is defined
+
+- name: "Go-Lang | Run get commands"
+  shell: "{{ GOROOT }}/bin/go get -u {{ item.url }}"
+  environment:
+    GOPATH: "{{ GOPATH }}"
+    GOROOT: "{{ GOROOT }}"
+  with_items: "{{ go_get }}"
+  changed_when: false
+  when: install is not skipped

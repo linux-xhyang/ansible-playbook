@@ -1,0 +1,30 @@
+---
+go_download_location: "https://dl.google.com/go/{{ go_tarball }}"
+go_reget: false
+go_get:
+- name: gocode
+  url: github.com/mdempsky/gocode
+- name: godef
+  url: github.com/rogpeppe/godef
+- name: guru
+  url: golang.org/x/tools/cmd/guru
+- name: gorename
+  url: golang.org/x/tools/cmd/gorename
+- name: goimports
+  url: golang.org/x/tools/cmd/goimports
+- name: gogetdoc
+  url: github.com/zmb3/gogetdoc
+- name: gotests
+  url: github.com/cweill/gotests/...
+- name: gopkgs
+  url: github.com/haya14busa/gopkgs/cmd/gopkgs
+- name: fillstruct
+  url: github.com/davidrjenni/reftools/cmd/fillstruct
+- name: impl
+  url: github.com/josharian/impl
+- name: gometalinter
+  url: github.com/alecthomas/gometalinter
+- name: godoctor
+  url: github.com/godoctor/godoctor
+- name: go-langserver
+  url: github.com/sourcegraph/go-langserver

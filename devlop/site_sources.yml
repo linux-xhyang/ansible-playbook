@@ -6,6 +6,7 @@
     - vars/variables.yml
 
   roles:
+    - role: site_go
     - role: source_sync
 
   tags:

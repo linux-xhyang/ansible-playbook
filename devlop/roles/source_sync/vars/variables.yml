@@ -34,6 +34,7 @@ sources:
     dest_dir: "~/src/global/"
     use_command: "git"
     build_cmd:
+      - "git clean -df"
       - "sh reconf.sh"
       - "./configure"
       - "make -j8"

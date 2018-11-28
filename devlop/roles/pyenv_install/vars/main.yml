@@ -1,0 +1,6 @@
+---
+pyenv_root: ~/.pyenv
+
+pyenv_versions: []
+
+pyenv_virtualenv: true

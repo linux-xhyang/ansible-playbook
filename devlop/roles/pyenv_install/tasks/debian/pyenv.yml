@@ -1,0 +1,26 @@
+---
+- apt_repository:
+    repo: ppa:george-edison55/cmake-3.x
+
+- name: Install requirements
+  apt: pkg={{ item }} state=present
+  with_items:
+    - tk-dev
+    - libssl-dev
+    - zlib1g-dev
+    - libbz2-dev
+    - libreadline-dev
+    - libsqlite3-dev
+    - wget
+    - curl
+    - cmake
+
+- name: Install
+  git: repo=https://github.com/yyuu/pyenv.git dest={{ pyenv_root }}
+
+- name: Install virtualenv
+  git: repo=https://github.com/yyuu/{{ item }}.git dest={{ pyenv_root }}/plugins/{{ item }}
+  with_items:
+    - pyenv-virtualenv
+    - pyenv-virtualenvwrapper
+  when: pyenv_virtualenv

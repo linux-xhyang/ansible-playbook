@@ -1,0 +1,12 @@
+
+- name: Install Depend Action
+  hosts: localhost
+  become: true
+  vars_files:
+    - vars/variables.yml
+
+  roles:
+    - role: common
+
+  tags:
+    - toolkit-install

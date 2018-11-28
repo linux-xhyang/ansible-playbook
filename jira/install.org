@@ -1,0 +1,62 @@
+
+* install
+  #+BEGIN_SRC sh
+    # 安装 MySQL
+    docker run --name mysql -p 3306:3306 -v /mnt/data/mysql:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=yourpasswd -idt --restart=always mysql/mysql-server:5.7 --character-set-server=utf8 --collation-server=utf8_bin --max_allowed_packet=512M --innodb_log_file_size=2GB --transaction_isolation=READ-COMMITTED
+    docker exec -it mysql /bin/bash
+
+    # 创建 JIRA 数据库
+    bash# mysql -uroot -p
+    mysql> show variables like 'char%';
+    mysql> CREATE DATABASE jira CHARACTER SET utf8 COLLATE utf8_bin;
+    mysql> grant ALL PRIVILEGES on jira.* to jira@"%" Identified by "yourpassword";
+    mysql> SHOW CREATE DATABASE jira;
+    mysql> flush privileges;
+
+    # 创建 Confluence 数据库
+    mysql> show variables like 'char%';
+    mysql> create database confluence CHARACTER SET utf8 COLLATE utf8_bin;
+    mysql> grant ALL PRIVILEGES on confluence.* to confluence@"%" Identified by "yourpassword";
+    mysql> SHOW CREATE DATABASE confluence;
+    mysql> flush privileges;
+
+    # 创建数据库备份用户
+    mysql> grant select on *.* to backup@"%" Identified by "yourpassword";
+    mysql> flush privileges;
+
+    # 安装 JIRA
+    docker run -v /mnt/data/jira:/var/atlassian/jira -p 8080:8080 -idt --name jira --restart=always docker.io/cptactionhank/atlassian-jira
+    docker exec -it jira /bin/bash
+
+    # 安装 Confluence
+    docker build -t formovie/confluence-server .
+    docker run -v /mnt/data/confluence:/var/atlassian/application-data/confluence --name="confluence" -d -p 8090:8090 -p 8091:8091 --restart=always formovie/confluence-server
+
+    # 启动 nginx
+    docker run -v /mnt/data/nginx/conf.d:/etc/nginx/conf.d --name nginx -d -p 80:80 --restart=always nginx
+  #+END_SRC
+
+  注意 Confluence 的镜像文件需要自行构建，主要是导入 MySQL 的连接组件，其 Dockerfile 内容如下：
+  #+BEGIN_SRC sh
+    FROM atlassian/confluence-server
+    MAINTAINER Jacky <wangyi@formovie.cn>
+
+    # crack
+    # ADD crack/atlassian-extras-decoder-v2-3.2.jar ${CONFLUENCE_INSTALL_DIR}/confluence/WEB-INF/lib/atlassian-extras-decoder-v2-3.2.jar
+    # set file attr
+    # RUN chown -R ${RUN_USER}:${RUN_GROUP} ${CONFLUENCE_INSTALL_DIR}/confluence/WEB-INF/lib/atlassian-extras-decoder-v2-3.2.jar
+
+    COPY mysql-connector-java-5.1.47.jar /opt/atlassian/confluence/confluence/WEB-INF/lib
+
+    CMD ["/entrypoint.sh", "-fg"]
+    ENTRYPOINT ["/sbin/tini", "--"]
+  #+END_SRC
+
+  安装过程中容易遇到的几个坑:
+  - MySQL 数据库无法启动
+  有可能是数据盘路径没有权限，这时需要在 docker run 时给容器增加权限，加上 --privileged=true 参数即可。
+  - MySQL 数据库无法连接
+  有可能是宿主机没有开启 3306 端口，比如 CentOS 上有防火墙，可以执行如下命令：
+  #+BEGIN_SRC sh
+    firewall-cmd --zone=public --add-port=3306/tcp --permanent
+  #+END_SRC

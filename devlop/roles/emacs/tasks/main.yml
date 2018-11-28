@@ -103,6 +103,12 @@
   tags:
     - install
 
+- name: Add emacs environment variables to profile
+  template: src=emacs-init.j2 dest=/etc/profile.d/emacs-init.sh
+  become: yes
+  tags:
+    - setup
+
 - name: Setup | remember when we last pulled emacs sources
   file: path=~/src/emacs/  state=touch
   become: no

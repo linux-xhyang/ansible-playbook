@@ -9,7 +9,7 @@
   register: username_on_the_host
 
 - name: Check if texlive is installed
-  command: tex -v |grep "{{texlive_version_text}}"
+  command: "{{ texlive_install_dir }}/tex -v"
   register: install
   failed_when: false
   changed_when: false

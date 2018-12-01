@@ -22,6 +22,7 @@ sources:
   - name: ctags
     repo_url: "https://github.com/universal-ctags/ctags.git"
     dest_dir: "~/src/ctags/"
+    build_dir: "~/src/ctags/"
     use_command: "git"
     build_cmd:
       - "./autogen.sh"
@@ -32,6 +33,7 @@ sources:
   - name: global
     repo_url: "https://github.com/punitagrawal/global.git"
     dest_dir: "~/src/global/"
+    build_dir: "~/src/global/"
     use_command: "git"
     build_cmd:
       - "git clean -df"
@@ -43,7 +45,8 @@ sources:
   - name: cquery
     repo_url: "https://github.com/cquery-project/cquery.git"
     dest_dir: "~/src/cquery/"
+    build_dir: "~/src/cquery/build/"
     use_command: "git"
     build_cmd:
       - "mkdir -p build"
-      - "cmake -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES --build build"
+      - "cmake -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES .."

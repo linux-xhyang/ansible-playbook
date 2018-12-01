@@ -12,6 +12,7 @@
   register: version_stat
 
 - name: Install versions
+  become: no
   command: creates={{pyenv_root}}/versions/{{ item.item }} pyenv install {{ item.item }}
   with_items: "{{version_stat.results}}"
   when:

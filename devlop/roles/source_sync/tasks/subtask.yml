@@ -2,6 +2,11 @@
   command: whoami
   become: no
   register: username_on_the_host
+ 
+- name: Install requirements
+  apt: pkg={{ item }} state=present
+  with_items:
+    - gperf
 
 - stat: path="{{sync_work.dest_dir}}"
   register: pulled
@@ -35,16 +40,13 @@
 - name: Build {{sync_work.dest_dir}} sources
   loop_control:
     loop_var: cmd
-  command: "{{cmd}} chdir={{sync_work.dest_dir}}"
+  command: "{{cmd}} chdir={{sync_work.build_dir}}"
   when: src.changed and {{'build_cmd' in sync_work.keys()}}
   with_items: "{{sync_work.build_cmd}}"
   register: configure_make
   become: no
   tags:
     - build
-
-- debug:
-    msg: "{{configure_make.changed}}"
 
 - name: Install {{sync_work}} sources
   command: make install chdir={{pulled.stat.path}}

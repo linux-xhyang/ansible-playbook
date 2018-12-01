@@ -16,9 +16,11 @@
     - cmake
 
 - name: Install
+  become: no
   git: repo=https://github.com/yyuu/pyenv.git dest={{ pyenv_root }}
 
 - name: Install virtualenv
+  become: no
   git: repo=https://github.com/yyuu/{{ item }}.git dest={{ pyenv_root }}/plugins/{{ item }}
   with_items:
     - pyenv-virtualenv

@@ -1,1 +1,3 @@
 ansible-playbook site.yml --ask-become-pass -vvv
+#if failed with not found apt module
+ansible-playbook site.yml --ask-become-pass -vvv -e ansible_python_interpreter=/usr/bin/python

@@ -8,11 +8,17 @@
   become: no
   register: username_on_the_host
 
+- name: Check if texlive is exists
+  stat:
+    path: "{{texlive_install_dir}}/tex"
+  register: tex_exe
+
 - name: Check if texlive is installed
   command: "{{ texlive_install_dir }}/tex -v"
   register: install
   failed_when: false
   changed_when: false
+  when: tex_exe.stat.exists
   become: no
 
 - name: Get md5 zip
@@ -21,14 +27,14 @@
     checksum_algorithm: md5
     get_checksum: yes
   register: zip_stat
-  when: install.stdout.find(texlive_version_text) == -1
+  when: tex_exe.stat.exists and (install.stdout.find(texlive_version_text) == -1)
   become: no
 
 - debug:
     msg: "{{zip_stat}}"
 
 - name: Download Texlive {{texlive_version}}
-  when: install.stdout.find(texlive_version_text) == -1 and
+  when: tex_exe.stat.exists and install.stdout.find(exlive_version_text) == -1 and
         ((not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{texlive_checksum}}"))
   get_url:
     dest: "/home/{{username_on_the_host.stdout}}/{{texlive_cache_dir}}"
@@ -46,18 +52,18 @@
     opts: ro,loop,noauto
     state: mounted
   become: yes
-  when: install.stdout.find(texlive_version_text) == -1
+  when: (not tex_exe.stat.exists) or install.stdout.find(texlive_version_text) == -1
   tags: [texlive]
 
 - name: Create TexLive profile
   template: src=texlive.profile dest=/tmp/texlive.profile
   become: yes
-  when: install.stdout.find(texlive_version_text) == -1
+  when: (not tex_exe.stat.exists) or install.stdout.find(texlive_version_text) == -1
   tags: [texlive]
 
 - name: Install Texlive
   command: ./install-tl --profile=/tmp/texlive.profile chdir=/media/texlive
-  when: install.stdout.find(texlive_version_text) == -1
+  when: (not tex_exe.stat.exists) or install.stdout.find(texlive_version_text) == -1
   become: yes
 
 - name: Add Font to system

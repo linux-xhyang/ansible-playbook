@@ -34,6 +34,8 @@
     # To integrate terminal emacs with system clipboard
     - xsel
     - git
+    - indicator-notifications
+    - notifyosdconfig
   tags:
       - setup
 

@@ -1,0 +1,11 @@
+- apt_repository:
+    repo: universe
+
+- name: Install requied package when ubuntu 18.04
+  apt: pkg={{ item }} state=present update_cache=yes install_recommends=no cache_valid_time=604800
+  become: yes
+  with_items:
+    - libgnutls28-dev
+    - gnome-tweak-tool
+    - gnome-shell-extensions
+    - chrome-gnome-shell

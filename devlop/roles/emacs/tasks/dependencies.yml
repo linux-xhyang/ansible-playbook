@@ -27,17 +27,20 @@
     - sharutils
     - texinfo
     - xaw3dg-dev
-    - libgnutls-dev
     # For xwidgets
     - libgtk-3-dev
     - libwebkitgtk-3.0-dev
     # To integrate terminal emacs with system clipboard
     - xsel
     - git
-    - indicator-notifications
-    - notifyosdconfig
   tags:
       - setup
+
+- include: ubuntu18_04.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '18.04'
+
+- include: ubuntu16_04.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
 - name: Setup | set postfix selections wtihout prompting
   shell: echo postfix postfix/mailname string `hostname` | debconf-set-selections

@@ -1,0 +1,10 @@
+- apt_repository:
+    repo: ppa:jconti/recent-notifications
+
+- name: Install requied package when ubuntu 16.04
+  apt: pkg={{ item }} state=present update_cache=yes install_recommends=no cache_valid_time=604800
+  become: yes
+  with_items:
+    - libgnutls-dev
+    - indicator-notifications
+    - notifyosdconfig

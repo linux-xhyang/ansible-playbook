@@ -10,22 +10,22 @@
 
 - stat: path="{{sync_work.dest_dir}}"
   register: pulled
-  become: no
   tags:
     - pull
 
 - name: use file module to create a timestamp file for "now"
   file: path="~/ansible.now" state=touch
+  become: no
   tags:
     - pull
 
 - stat: path=~/ansible.now
   register: now
+  become: no
   tags:
     - pull
 
-
-- name: Pull latest {{sync_work.repo_url}} sources
+- name: Pull latest "{{sync_work.repo_url}}" sources
   when: ((not pulled.stat.exists) or
          (pulled.stat.exists and pulled.stat.mtime  + secondsPerWeek < now.stat.mtime))
   git: repo={{sync_work.repo_url}} accept_hostkey=true dest={{sync_work.dest_dir}} track_submodules=yes force=yes
@@ -37,7 +37,13 @@
 - debug:
     msg: "{{sync_work}} and {{src}}"
 
-- name: Build {{sync_work.dest_dir}} sources
+- file:
+    path: "{{sync_work.build_dir}}"
+    state: directory
+  when: src.changed and {{'build_dir' in sync_work.keys()}}
+  become: no
+
+- name: Build "{{sync_work.dest_dir}}" sources
   loop_control:
     loop_var: cmd
   command: "{{cmd}} chdir={{sync_work.build_dir}}"
@@ -48,14 +54,14 @@
   tags:
     - build
 
-- name: Install {{sync_work}} sources
-  command: make install chdir={{pulled.stat.path}}
+- name: Install "{{sync_work}}" sources
+  command: make install chdir={{sync_work.dest_dir}}
   when: configure_make.changed and {{'install_cmd' in sync_work.keys()}}
   become: yes
   tags:
     - install
 
-- name: Remember when we last pulled {{sync_work.dest_dir}} sources
+- name: Remember when we last pulled "{{sync_work.dest_dir}}" sources
   file: path={{sync_work.dest_dir}}  state=touch
   become: no
   tags:

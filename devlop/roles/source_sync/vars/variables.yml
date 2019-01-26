@@ -1,28 +1,33 @@
+secondsPerMinute: 60
+secondsPerHour: 3600
+secondsPerDay: 86400
+secondsPerWeek: 604800
+
 sources:
   - name: catapult
     repo_url: "https://github.com/catapult-project/catapult.git"
-    dest_dir: "~/src/catapult/"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/catapult/"
     use_command: "git"
 
   - name: pydata
     repo_url: "https://github.com/linux-xhyang/pydata.git"
-    dest_dir: "~/src/pydata/"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/pydata/"
     use_command: "git"
 
   - name: opencv
     repo_url: "https://github.com/opencv/opencv.git"
-    dest_dir: "~/src/opencv/"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/opencv/"
     use_command: "git"
 
   - name: ndk-project
     repo_url: "https://github.com/linux-xhyang/ndk-project.git"
-    dest_dir: "~/src/ndk-project/"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/ndk-project/"
     use_command: "git"
 
   - name: ctags
     repo_url: "https://github.com/universal-ctags/ctags.git"
-    dest_dir: "~/src/ctags/"
-    build_dir: "~/src/ctags/"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/ctags/"
+    build_dir: "/home/{{username_on_the_host.stdout}}/src/ctags/"
     use_command: "git"
     build_cmd:
       - "./autogen.sh"
@@ -32,13 +37,13 @@ sources:
 
   - name: cquery
     repo_url: "https://github.com/cquery-project/cquery.git"
-    dest_dir: "~/src/cquery/"
-    build_dir: "~/src/cquery/build/"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/cquery/"
+    build_dir: "/home/{{username_on_the_host.stdout}}/src/cquery/build/"
     use_command: "git"
     build_cmd:
-      - "mkdir -p build"
-      - "cmake -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES .."
-
+      - "git submodule update --init"
+      - "cmake .. -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+      - "cmake --build ."
   # - name: global
   #   repo_url: "https://github.com/punitagrawal/global.git"
   #   dest_dir: "~/src/global/"

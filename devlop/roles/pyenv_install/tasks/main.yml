@@ -6,14 +6,19 @@
   become: no
   register: username_on_the_host
 
-- name: Check if the disk is partitioned and also ignore sda
+- file:
+    path: /home/{{username_on_the_host.stdout}}/.pyenv/versions/
+    state: directory
+  become: no
+
+- name: Check if has install
   stat: path=/home/{{username_on_the_host.stdout}}/.pyenv/versions/{{item}}
   with_items: "{{pyenv_versions}}"
   register: version_stat
 
 - name: Install versions
   become: no
-  command: creates={{pyenv_root}}/versions/{{ item.item }} pyenv install {{ item.item }}
+  command: /home/{{username_on_the_host.stdout}}/.pyenv/bin/pyenv install {{ item.item }}
   with_items: "{{version_stat.results}}"
   when:
     - item.stat.exists == false

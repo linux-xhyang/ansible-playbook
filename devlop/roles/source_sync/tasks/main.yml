@@ -1,3 +1,8 @@
+- name: get the username running the deploy
+  command: whoami
+  become: no
+  register: username_on_the_host
+
 - name: Include Vars
   include_vars: "{{ item }}"
   with_first_found:

@@ -9,7 +9,6 @@
     - role: pyenv_install
       pyenv_versions:
         - 3.6.5
-        - 2.7.12
 
   tags:
     - toolkit-install

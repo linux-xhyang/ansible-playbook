@@ -1,6 +1,6 @@
 ---
 - include: ubuntu16_04.yml
-    when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
 
 - name: Install requirements
   apt: pkg={{ item }} state=present

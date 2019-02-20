@@ -33,6 +33,7 @@
     # To integrate terminal emacs with system clipboard
     - xsel
     - git
+    - astyle
   tags:
       - setup
 

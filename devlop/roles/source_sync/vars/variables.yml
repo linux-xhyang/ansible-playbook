@@ -44,6 +44,18 @@ sources:
       - "git submodule update --init"
       - "cmake .. -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
       - "cmake --build ."
+
+  - name: doxymacs
+    repo_url: "https://git.code.sf.net/p/doxymacs/code"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/doxymacs-code/"
+    build_dir: "/home/{{username_on_the_host.stdout}}/src/cquery/"
+    use_command: "git"
+    build_cmd:
+      - "./bootstrap"
+      - "CC=gcc-5 CXX=g++-5  ./configure"
+      - "make"
+    install_cmd: "make install"
+
   # - name: global
   #   repo_url: "https://github.com/punitagrawal/global.git"
   #   dest_dir: "~/src/global/"

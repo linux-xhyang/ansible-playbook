@@ -34,7 +34,7 @@
     dest: "/home/{{username_on_the_host.stdout}}/{{android_ndk_cache_dir}}"
     url: "https://dl.google.com/android/repository/{{android_ndk_zipfile}}"
     validate_certs: no
-    checksum: sha256:{{android_ndk_checksum}}
+    checksum: sha1:{{android_ndk_checksum}}
   become: no
   tags: [android]
 

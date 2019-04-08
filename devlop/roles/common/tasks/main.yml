@@ -5,3 +5,4 @@
 
   - name: Creates ansible cache directory
     file: path=/home/{{username_on_the_host.stdout}}/{{download_cache}} state=directory recurse=yes
+    become: no

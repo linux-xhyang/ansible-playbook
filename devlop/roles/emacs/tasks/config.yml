@@ -71,6 +71,13 @@
   tags:
       - pull
 
+- name: Clean private path
+  file:
+    state: absent
+    path: ~/.emacs.d/private
+  become: no
+  when: spacemacs_config is success and (not spacemacs_config is skipped)
+
 - name: Setup | pull latest private config
   when: ((not private.stat.exists) or
          (private.stat.exists and spacemacs.stat.mtime  + secondsPerWeek < now.stat.mtime))

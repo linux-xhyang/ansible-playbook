@@ -34,7 +34,7 @@
     msg: "{{zip_stat}}"
 
 - name: Download Texlive {{texlive_version}}
-  when: tex_exe.stat.exists and install.stdout.find(texlive_version_text) == -1 and
+  when: (not tex_exe.stat.exists) or (tex_exe.stat.exists and install.stdout.find(texlive_version_text) == -1) and
         ((not zip_stat.stat.exists) or (zip_stat.stat.checksum != "{{texlive_checksum}}"))
   get_url:
     dest: "/home/{{username_on_the_host.stdout}}/{{texlive_cache_dir}}"

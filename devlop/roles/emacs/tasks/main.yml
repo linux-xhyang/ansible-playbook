@@ -59,7 +59,7 @@
 - name: Setup | pull latest emacs sources
   when: ((not pulled.stat.exists) or
          (pulled.stat.exists and pulled.stat.mtime  + secondsPerWeek < now.stat.mtime))
-  git: repo=git://git.savannah.gnu.org/emacs.git accept_hostkey=true dest=~/src/emacs
+  git: repo=git://git.savannah.gnu.org/emacs.git accept_hostkey=true dest=~/src/emacs version=emacs-26
   register: src
   become: no
   tags:

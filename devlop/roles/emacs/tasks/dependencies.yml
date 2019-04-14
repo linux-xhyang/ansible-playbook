@@ -34,6 +34,11 @@
     - xsel
     - git
     - astyle
+    - libpng-dev
+    - zlib1g-dev
+    - libpoppler-glib-dev
+    - libpoppler-private-dev
+    - imagemagick
   tags:
       - setup
 

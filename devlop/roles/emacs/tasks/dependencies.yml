@@ -39,6 +39,7 @@
     - libpoppler-glib-dev
     - libpoppler-private-dev
     - imagemagick
+    - silversearcher-ag
   tags:
       - setup
 

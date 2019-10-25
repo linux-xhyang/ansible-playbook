@@ -35,14 +35,22 @@ sources:
       - "make"
     install_cmd: "make install"
 
-  - name: cquery
-    repo_url: "https://github.com/cquery-project/cquery.git"
-    dest_dir: "/home/{{username_on_the_host.stdout}}/src/cquery/"
-    build_dir: "/home/{{username_on_the_host.stdout}}/src/cquery/build/"
+    # need g++7
+    # sudo apt-get install -y software-properties-common
+    # sudo add-apt-repository ppa:ubuntu-toolchain-r/test
+    # sudo apt update
+    # sudo apt install g++-7 -y
+    # "wget -c http://releases.llvm.org/8.0.0/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
+    # "tar xf clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
+  - name: ccls
+    repo_url: "https://github.com/MaskRay/ccls.git"
+    dest_dir: "/home/{{username_on_the_host.stdout}}/src/ccls/"
+    build_dir: "/home/{{username_on_the_host.stdout}}/src/ccls/"
     use_command: "git"
     build_cmd:
       - "git submodule update --init"
-      - "cmake .. -DCMAKE_BUILD_TYPE=debug -DCMAKE_INSTALL_PREFIX=debug -DCMAKE_EXPORT_COMPILE_COMMANDS=YES"
+      - "cmake -H. -BRelease -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$PWD/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04"
+      - "cmake --build Release"
       - "cmake --build ."
 
   - name: doxymacs

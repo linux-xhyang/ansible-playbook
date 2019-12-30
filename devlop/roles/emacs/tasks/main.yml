@@ -59,7 +59,7 @@
 - name: Setup | pull latest emacs sources
   when: ((not pulled.stat.exists) or
          (pulled.stat.exists and pulled.stat.mtime  + secondsPerWeek < now.stat.mtime))
-  git: repo=https://github.com/emacs-mirror/emacs.git accept_hostkey=true dest=~/src/emacs version=emacs-26
+  git: repo=https://github.com/emacs-mirror/emacs.git accept_hostkey=true dest=~/src/emacs version=emacs-27
   register: src
   become: no
   tags:

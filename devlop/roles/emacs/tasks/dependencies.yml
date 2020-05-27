@@ -41,6 +41,9 @@
     - imagemagick
     - silversearcher-ag
     - libjansson-dev
+    - gawk
+    - net-tools
+    - coreutils
   tags:
       - setup
 

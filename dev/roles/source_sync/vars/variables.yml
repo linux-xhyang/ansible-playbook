@@ -49,7 +49,7 @@ sources:
     use_command: "git"
     build_cmd:
       - "git submodule update --init"
-      - "cmake -H. -BRelease -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=$PWD/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04  -DCMAKE_CXX_COMPILER=g++"
+      - "cmake -H. -BRelease -DCMAKE_BUILD_TYPE=Release -DUSE_SYSTEM_RAPIDJSON=ON -DCMAKE_PREFIX_PATH=$PWD/clang+llvm-8.0.0-x86_64-linux-gnu-ubuntu-18.04  -DCMAKE_CXX_COMPILER=g++"
       - "cmake --build Release"
 
   - name: doxymacs

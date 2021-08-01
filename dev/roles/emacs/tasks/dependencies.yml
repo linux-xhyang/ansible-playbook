@@ -44,6 +44,7 @@
     - gawk
     - net-tools
     - coreutils
+    - flameshot
   tags:
       - setup
 
@@ -52,6 +53,9 @@
 
 - include: ubuntu16_04.yml
   when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '16.04'
+
+- include: ubuntu18_04.yml
+  when: ansible_distribution == 'Ubuntu' and ansible_distribution_version == '20.04'
 
 - name: Setup | set postfix selections wtihout prompting
   shell: echo postfix postfix/mailname string `hostname` | debconf-set-selections

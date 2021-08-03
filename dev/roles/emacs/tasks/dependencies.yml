@@ -29,7 +29,7 @@
     - xaw3dg-dev
     # For xwidgets
     - libgtk-3-dev
-    - libwebkitgtk-3.0-dev
+    #- libwebkitgtk-3.0-dev
     # To integrate terminal emacs with system clipboard
     - xsel
     - git

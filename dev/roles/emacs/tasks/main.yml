@@ -79,7 +79,7 @@
 #
 - name: Setup | configure
   when: autogen.changed
-  command: CC="gcc-9" ./configure --with-mailutils --with-native-compilation --without-pop --without-kerberos --without-kerberos5 --without-hesiod --with-sound=alsa --with-x-toolkit=gtk3 --with-xpm --with-jpeg --with-tiff --with-gif --with-png --with-rsvg  --with-xml2 --with-imagemagick --with-xft --without-libotf --without-xim --with-xaw3d --with-dbus --without-gsettings --with-gnutls --with-zlib --with-modules --with-x --with-wide-int --exec-prefix=/usr/ CFLAGS="-O2 -pipe" chdir=~/src/emacs
+  command: CC="gcc-10" ./configure --with-mailutils --with-native-compilation --without-pop --without-kerberos --without-kerberos5 --without-hesiod --with-sound=alsa --with-x-toolkit=gtk3 --with-xpm --with-jpeg --with-tiff --with-gif --with-png --with-rsvg  --with-xml2 --with-imagemagick --with-xft --without-libotf --without-xim --with-xaw3d --with-dbus --without-gsettings --with-gnutls --with-zlib --with-modules --with-x --with-wide-int --exec-prefix=/usr/ CFLAGS="-O2 -pipe" chdir=~/src/emacs
   register: configure
   become: no
   tags:
@@ -87,7 +87,7 @@
 
 - name: Setup | bootstrap
   when: configure.changed
-  command: CC="gcc-9" make NATIVE_FULL_AOT=1 bootstrap -j8 chdir=~/src/emacs
+  command: CC="gcc-10" make NATIVE_FULL_AOT=1 bootstrap -j8 chdir=~/src/emacs
   register: bootstrap
   become: no
   tags:
